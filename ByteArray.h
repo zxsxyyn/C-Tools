@@ -30,12 +30,9 @@ namespace ustd
 
         ByteArray& operator<<(const std::string& str);
         ByteArray& operator<<(const char* str);
-        ByteArray& operator<<(short s_integer);
-        ByteArray& operator<<(unsigned short s_integer);
-        ByteArray& operator<<(int integer);
-        ByteArray& operator<<(long l_integer);
-        ByteArray& operator<<(unsigned uinteger);
-        ByteArray& operator<<(unsigned long ul_integer);
+        ByteArray& operator<<(short value);
+        ByteArray& operator<<(int value);
+        ByteArray& operator<<(long value);
         ByteArray& append(const char* buf,unsigned short size);
 
         void compact();//压缩空间
