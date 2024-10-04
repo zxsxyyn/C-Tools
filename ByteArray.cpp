@@ -102,51 +102,27 @@ ustd::ByteArray &ustd::ByteArray::operator<<(const char *str)
     return *this;
 }
 
-ustd::ByteArray &ustd::ByteArray::operator<<(short s_integer)
+ustd::ByteArray &ustd::ByteArray::operator<<(short value)
 {
     unsigned pos = thesize;
     resize(thesize + sizeof(short));
-    memcpy(array + pos, &s_integer, sizeof(short));
+    memcpy(array + pos, &value, sizeof(short));
     return *this;
 }
 
-ustd::ByteArray &ustd::ByteArray::operator<<(unsigned short s_integer)
-{
-    unsigned pos = thesize;
-    resize(thesize + sizeof(unsigned short));
-    memcpy(array + pos, &s_integer, sizeof(unsigned short));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(int integer)
+ustd::ByteArray &ustd::ByteArray::operator<<(int value)
 {
     unsigned pos = thesize;
     resize(thesize + sizeof(int));
-    memcpy(array + pos, &integer, sizeof(int));
+    memcpy(array + pos, &value, sizeof(int));
     return *this;
 }
 
-ustd::ByteArray &ustd::ByteArray::operator<<(long l_integer)
+ustd::ByteArray &ustd::ByteArray::operator<<(long value)
 {
     unsigned pos = thesize;
     resize(thesize + sizeof(long));
-    memcpy(array + pos, &l_integer, sizeof(long));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(unsigned uinteger)
-{
-    unsigned pos = thesize;
-    resize(thesize + sizeof(unsigned));
-    memcpy(array + pos, &uinteger, sizeof(unsigned));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(unsigned long ul_integer)
-{
-    unsigned pos = thesize;
-    resize(thesize + sizeof(unsigned long));
-    memcpy(array + pos, &ul_integer, sizeof(unsigned long));
+    memcpy(array + pos, &value, sizeof(long));
     return *this;
 }
 
