@@ -2,7 +2,7 @@
 #include <cstring>
 #include <iomanip>
 
-void ustd::ByteArray::resize(unsigned short newsize)
+void ustd::ByteArray::resize(size_t newsize)
 {
     if (newsize > thecapacity)
     {
@@ -11,12 +11,14 @@ void ustd::ByteArray::resize(unsigned short newsize)
     thesize = newsize;
 }
 
-void ustd::ByteArray::advance(unsigned short value)
+void ustd::ByteArray::advance(size_t value)
 {
     readIndex+=value;
+    /*
     if(readIndex>=thesize/2){
         compact();
     }
+    */
 }
 
 ustd::ByteArray::ByteArray()
@@ -24,7 +26,13 @@ ustd::ByteArray::ByteArray()
     array = new char[DEFALTCAPACITY];
 }
 
-ustd::ByteArray::ByteArray(unsigned short capacity) : thecapacity(capacity)
+ustd::ByteArray::ByteArray(const char *buf, size_t size_):thecapacity(size_),thesize(size_)
+{
+    array = new char[size_];
+    memcpy(array, buf, size_);
+}
+
+ustd::ByteArray::ByteArray(size_t capacity) : thecapacity(capacity)
 {
     array = new char[thecapacity];
 }
@@ -67,7 +75,24 @@ ustd::ByteArray::~ByteArray()
     array = nullptr;
 }
 
-void ustd::ByteArray::reserve(unsigned short capacity)
+char &ustd::ByteArray::operator[](size_t index)
+{
+    if (index >= thesize)
+    {
+        throw("数组越界");
+    }
+    return array[index];
+}
+const char &ustd::ByteArray::operator[](size_t index) const
+{
+    if (index >= thesize)
+    {
+        throw("数组越界");
+    }
+    return array[index];
+}
+
+void ustd::ByteArray::reserve(size_t capacity)
 {
     if (capacity <= thecapacity)
     {
@@ -80,53 +105,7 @@ void ustd::ByteArray::reserve(unsigned short capacity)
     delete old;
 }
 
-ustd::ByteArray &ustd::ByteArray::operator<<(const std::string &str)
-{
-    unsigned pos = thesize;
-    resize(thesize + str.length());
-    memcpy(array + pos, str.c_str(), str.length());
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(const char *str)
-{
-    unsigned strsize = 0;
-    const char *ptr = str;
-    while (*ptr++)
-    {
-        strsize++;
-    }
-    unsigned pos = thesize;
-    resize(thesize + strsize);
-    memcpy(array + pos, str, strsize);
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(short value)
-{
-    unsigned pos = thesize;
-    resize(thesize + sizeof(short));
-    memcpy(array + pos, &value, sizeof(short));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(int value)
-{
-    unsigned pos = thesize;
-    resize(thesize + sizeof(int));
-    memcpy(array + pos, &value, sizeof(int));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator<<(long value)
-{
-    unsigned pos = thesize;
-    resize(thesize + sizeof(long));
-    memcpy(array + pos, &value, sizeof(long));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::append(const char *buf, unsigned short size)
+ustd::ByteArray &ustd::ByteArray::append(const char *buf, size_t size)
 {
     unsigned pos = thesize;
     resize(thesize + size);
@@ -136,49 +115,13 @@ ustd::ByteArray &ustd::ByteArray::append(const char *buf, unsigned short size)
 
 void ustd::ByteArray::compact()
 {
-    unsigned short surpsize=size();
+    size_t surpsize=size();
     memmove(array,array+readIndex,surpsize);
     readIndex=0;
     resize(surpsize);
 }
 
-short ustd::ByteArray::readShort()
-{
-    if(size()<sizeof(short)){
-        throw("剩余空间不足以读取short");
-        return 0;
-    }
-    short value;
-    memcpy(&value,array+readIndex,sizeof(short));
-    advance(sizeof(short));
-    return value;
-}
-
-int ustd::ByteArray::readInt()
-{
-    if(size()<sizeof(int)){
-        throw("剩余空间不足以读取int");
-        return 0;
-    }
-    int value;
-    memcpy(&value,array+readIndex,sizeof(int));
-    advance(sizeof(int));
-    return value;
-}
-
-long ustd::ByteArray::readLong()
-{
-    if(size()<sizeof(long)){
-        throw("剩余空间不足以读取long");
-        return 0;
-    }
-    long value;
-    memcpy(&value,array+readIndex,sizeof(long));
-    advance(sizeof(long));
-    return value;
-}
-
-bool ustd::ByteArray::read(void *buf, unsigned short size_)
+bool ustd::ByteArray::read(void *buf, size_t size_)
 {
     if(size()<size_){
         return false;
@@ -188,7 +131,7 @@ bool ustd::ByteArray::read(void *buf, unsigned short size_)
     return true;
 }
 
-std::string ustd::ByteArray::read(unsigned short size_)
+std::string ustd::ByteArray::read(size_t size_)
 {
     if(size()<size_)
         return std::string();
@@ -197,56 +140,12 @@ std::string ustd::ByteArray::read(unsigned short size_)
     return str;
 }
 
-ustd::ByteArray &ustd::ByteArray::operator>>(short &value)
-{
-    if(size()<sizeof(short)){
-        throw("剩余空间不足以读取short");
-        return *this;
-    }
-    memcpy(&value,array+readIndex,sizeof(short));
-    advance(sizeof(short));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator>>(int &value)
-{
-    if(size()<sizeof(int)){
-        throw("剩余空间不足以读取short");
-        return *this;
-    }
-    memcpy(&value,array+readIndex,sizeof(int));
-    advance(sizeof(int));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator>>(long &value)
-{
-    if(size()<sizeof(long)){
-        throw("剩余空间不足以读取short");
-        return *this;
-    }
-    memcpy(&value,array+readIndex,sizeof(long));
-    advance(sizeof(long));
-    return *this;
-}
-
-ustd::ByteArray &ustd::ByteArray::operator>>(char &c)
-{
-    if(size()<sizeof(char)){
-        throw("剩余空间不足以读取short");
-        return *this;
-    }
-    memcpy(&c,array+readIndex,sizeof(char));
-    advance(sizeof(char));
-    return *this;
-}
-
-unsigned short ustd::ByteArray::size() const
+size_t ustd::ByteArray::size() const
 {
     return thesize-readIndex;
 }
 
-unsigned short ustd::ByteArray::capacity() const
+size_t ustd::ByteArray::capacity() const
 {
     return thecapacity;
 }
@@ -267,12 +166,48 @@ const char *ustd::ByteArray::c_str() const
     return array;
 }
 
+bool ustd::ByteArray::seek(long pos, int whence)
+{
+    switch (whence)
+    {
+    case SEEKB_SET:
+        if (pos > thesize)
+        {
+            return false;
+        }
+        readIndex = pos;
+        break;
+    case SEEKB_CUR:
+        if ((pos + readIndex) > thesize)
+        {
+            return false;
+        }
+        readIndex += pos;
+        break;
+    case SEEKB_END:
+        if (pos > 0)
+        {
+            return false;
+        }
+        readIndex = thesize + pos;
+        break;
+    default:
+        return false;
+    }
+    return true;
+}
+
+size_t ustd::ByteArray::tell() const
+{
+    return readIndex;
+}
+
 namespace ustd
 {
     std::ostream& operator<<(std::ostream &os, const ustd::ByteArray &byteArray)
     {
         os << '[';
-        for (unsigned short i = byteArray.readIndex; i < byteArray.thesize-1; ++i)
+        for (size_t i = byteArray.readIndex; i < byteArray.thesize-1; ++i)
         {
             // 设置为16进制输出，每个字节占两位，前导补0
             os << std::hex << std::setw(2) << std::setfill('0')
