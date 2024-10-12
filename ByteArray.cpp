@@ -109,8 +109,35 @@ ustd::ByteArray &ustd::ByteArray::append(const char *buf, size_t size)
 {
     unsigned pos = thesize;
     resize(thesize + size);
-    memcpy(array, buf, size);
+    memcpy(array+pos, buf, size);
     return *this;
+}
+
+ustd::ByteArray &ustd::ByteArray::append(ByteArray &other, size_t size, bool auto_backward)
+{
+    unsigned pos = thesize;
+    resize(thesize + size);
+    memcpy(array+pos, other.array+other.readIndex, size);
+    if(auto_backward){
+        other.advance(size);
+    }
+    return *this;
+}
+
+ustd::ByteArray &ustd::ByteArray::operator<<(const std::string &str)
+{
+    return append(str.c_str(), str.size());
+}
+
+ustd::ByteArray &ustd::ByteArray::operator<<(const char *str)
+{
+    int len = strlen(str);
+    return append(str, len);
+}
+
+ustd::ByteArray &ustd::ByteArray::operator<<(const ByteArray &other)
+{
+    return append(other.array, other.thesize);
 }
 
 void ustd::ByteArray::compact()
@@ -163,7 +190,7 @@ bool ustd::ByteArray::empty() const
 
 const char *ustd::ByteArray::c_str() const
 {
-    return array;
+    return array+readIndex;
 }
 
 bool ustd::ByteArray::seek(long pos, int whence)

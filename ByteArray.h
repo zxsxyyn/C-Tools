@@ -21,7 +21,7 @@ namespace ustd
         void resize(size_t);
         void advance(size_t value);
     public:
-        inline static const size_t MAX_CAPACITY=sizeof(size_t);
+        //inline static const size_t MAX_CAPACITY;
         ByteArray();
         ByteArray(const char* buf,size_t size_);
         ByteArray(size_t capacity_);
@@ -39,10 +39,14 @@ namespace ustd
         template<typename T>
         ByteArray& operator<<(const T& value);//对于结构体，注意指针成员以及内存对齐问题
         ByteArray& append(const char* buf,size_t size);
+        //auto_backward=true时,会自动将other的流指针后移size个字节
+        ByteArray& append(ByteArray& other,size_t size,bool auto_backward=false);
+        ByteArray& operator<<(const std::string& str);
+        ByteArray& operator<<(const char* str);
+        ByteArray& operator<<(const ByteArray& other);
 
         template<typename T>
         ByteArray& operator>>(T& value);//对于结构体，注意指针成员以及内存对齐问题
-
         void compact();//压缩已经存放的字节，将剩余空间移动到头部
         bool read(void* buf,size_t size);
         std::string read(size_t size);
@@ -51,6 +55,7 @@ namespace ustd
         size_t capacity()const;
         void clear();
         bool empty()const;
+        //返回的是当前流位置的指针，而不是起始点
         const char* c_str()const;
         /*SEEKB_SET 开头位置
         SEEKB_CUR 当前位置
