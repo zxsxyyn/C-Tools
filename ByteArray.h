@@ -18,7 +18,7 @@ namespace ustd
         size_t thecapacity=DEFALTCAPACITY;//容量
         size_t thesize=0;//已经存放的字节数
         size_t readIndex=0;//读取索引
-        void resize(size_t);
+        
         void advance(size_t value);
     public:
         //inline static const size_t MAX_CAPACITY;
@@ -35,7 +35,7 @@ namespace ustd
         const char& operator[](size_t index)const;
 
         void reserve(size_t capacity);
-
+        void resize(size_t);
         template<typename T>
         ByteArray& operator<<(const T& value);//对于结构体，注意指针成员以及内存对齐问题
         ByteArray& append(const char* buf,size_t size);
